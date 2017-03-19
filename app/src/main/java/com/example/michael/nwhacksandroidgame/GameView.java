@@ -105,8 +105,6 @@ public class GameView extends SurfaceView implements Runnable {
     }
 
     private void update() {
-        boolean lost = false;
-
         // Move the player's ship
 
         // Update the invaders if visible
@@ -115,9 +113,10 @@ public class GameView extends SurfaceView implements Runnable {
         for(int i = 0; i < insects.length; i++) {
             if(insects[i].getStatus()) {
                 insects[i].update(fps);
-                if (insects[i].getX()+ 200 < 0 || insects[i].getY() + 200 < 0 ||
-                        insects[i].getX() > screenXSize || insects[i].getY() > screenYSize) {
+                if (insects[i].getRect().right < 0 || insects[i].getRect().bottom < 0 ||
+                        insects[i].getRect().left > screenXSize || insects[i].getRect().top > screenYSize) {
                     insects[i].setInactive();
+                    lives--;
                 }
             }
         }
