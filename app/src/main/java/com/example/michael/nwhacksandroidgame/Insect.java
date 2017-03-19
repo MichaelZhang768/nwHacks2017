@@ -21,7 +21,7 @@ public class Insect {
     public final int LEFT = 2;
     public final int RIGHT = 3;
 
-    private Random random;
+    private Random random = new Random();
 
     private int headingY = 0;
     private int headingX = 2;
@@ -44,14 +44,6 @@ public class Insect {
         whichAnimation = 1;
         this.screenX = screenX;
         this.screenY = screenY;
-    }
-
-    public float getX() {
-        return x;
-    }
-
-    public float getY() {
-        return y;
     }
 
     public RectF getRect() {

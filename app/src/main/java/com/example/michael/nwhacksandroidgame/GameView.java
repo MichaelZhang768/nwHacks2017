@@ -17,6 +17,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 import java.io.IOException;
+import java.util.Random;
 
 /**
  * Created by Michael on 3/18/2017.
@@ -107,9 +108,15 @@ public class GameView extends SurfaceView implements Runnable {
     private void update() {
         boolean lost = false;
 
-        // Move the player's ship
-
-        // Update the invaders if visible
+        Random random = new Random();
+        for(int i = 0; i < insects.length; i++) {
+            if(!insects[i].getStatus()) {
+                if(random.nextInt(1000) == 0) {
+                    System.out.println("hi");
+                    insects[i].setActive();
+                }
+            }
+        }
 
         // Update all the invaders bullets if active
         for(int i = 0; i < insects.length; i++) {
@@ -118,24 +125,11 @@ public class GameView extends SurfaceView implements Runnable {
             }
         }
 
-        // Did an invader bump into the edge of the screen
+        lost = true;
         if(lost) {
             prepareLevel();
         }
 
-        // Update the players bullet
-
-        // Has the player's bullet hit the top of the screen
-
-        // Has an invaders bullet hit the bottom of the screen
-
-        // Has the player's bullet hit an invader
-
-        // Has an alien bullet hit a shelter brick
-
-        // Has a player bullet hit a shelter brick
-
-        // Has an invader bullet hit the player ship
     }
 
     private void draw() {
@@ -219,9 +213,5 @@ public class GameView extends SurfaceView implements Runnable {
                 break;
         }
         return true;
-    }
-
-    public void hitWall(Insect ins) {
-
     }
 }
