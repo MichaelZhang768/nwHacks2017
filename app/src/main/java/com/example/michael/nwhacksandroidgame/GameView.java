@@ -8,6 +8,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.graphics.RectF;
 import android.media.AudioManager;
 import android.media.SoundPool;
@@ -49,6 +50,8 @@ public class GameView extends SurfaceView implements Runnable {
     Bitmap bitmapInsect3;
     Bitmap bitmapInsect4;
     Bitmap bitmapSplat;
+    Bitmap bitmapBackground = BitmapFactory.decodeResource(this.getResources(), R.drawable.background);
+
 
     int score = 0;
     int lives = 9;
@@ -66,15 +69,16 @@ public class GameView extends SurfaceView implements Runnable {
 
         soundPool = new SoundPool(10, AudioManager.STREAM_MUSIC, 0);
 
-//        try {
-//            AssetManager assetManager = context.getAssets();
-//            AssetFileDescriptor assetFileDescriptor;
-//
-//            assetFileDescriptor = assetManager.openFd("squished.ogg");
-//            squishBugID = soundPool.load(assetFileDescriptor, 0);
-//        } catch(IOException e) {
-//            Log.e("Error", "failed to load sound files");
-//        }
+
+        try {
+            AssetManager assetManager = context.getAssets();
+            AssetFileDescriptor assetFileDescriptor;
+
+            assetFileDescriptor = assetManager.openFd("splat.mp3");
+            squishBugID = soundPool.load(assetFileDescriptor, 0);
+        } catch(IOException e) {
+            Log.e("Error", "failed to load sound files");
+        }
 
         bitmapInsect1 = BitmapFactory.decodeResource(this.getResources(), R.drawable.insect1);
         bitmapInsect2 = BitmapFactory.decodeResource(this.getResources(), R.drawable.insect2);
@@ -146,8 +150,12 @@ public class GameView extends SurfaceView implements Runnable {
     private void draw() {
         if (surfaceHolder.getSurface().isValid()) {
             canvas = surfaceHolder.lockCanvas();
-            canvas.drawColor(Color.argb(255, 26, 128, 182));
-            paint.setColor(Color.argb(255, 255, 255, 255));
+//            canvas.drawColor(Color.argb(255, 26, 128, 182));
+//            paint.setColor(Color.argb(255, 255, 255, 255));
+            Rect rect = new Rect(0, 0, screenXSize, screenYSize);
+            canvas.drawBitmap(bitmapBackground, null, rect, paint);
+            //canvas.drawBitmap(bitmapBackground, 0, 0, null);
+
 
             for (int i = 0; i < insects.length; i++) {
                 if (insects[i].getStatus()) {
@@ -163,7 +171,9 @@ public class GameView extends SurfaceView implements Runnable {
                         drawInsect(insects[i]);
                     }
                 } else {
-                    canvas.drawBitmap(bitmapSplat, insects[i].getRect().left, insects[i].getRect().top, paint);
+                    if(System.currentTimeMillis() - insects[i].splatStartTime < 1000) {
+                        canvas.drawBitmap(bitmapSplat, insects[i].getRect().left, insects[i].getRect().top, paint);
+                    }
                 }
             }
 

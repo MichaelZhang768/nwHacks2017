@@ -35,6 +35,7 @@ public class Insect {
 
     public int whichAnimation;
 
+    public long splatStartTime;
 
     public Insect(int screenX, int screenY) {
         isActive = false;
@@ -70,6 +71,7 @@ public class Insect {
 
     public void setInactive() {
         isActive = false;
+        splatStartTime = System.currentTimeMillis();
     }
 
     public float getX() {
