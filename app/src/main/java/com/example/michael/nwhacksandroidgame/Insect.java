@@ -2,6 +2,8 @@ package com.example.michael.nwhacksandroidgame;
 
 import android.graphics.RectF;
 
+import java.util.Random;
+
 /**
  * Created by Michael on 3/18/2017.
  */
@@ -24,9 +26,16 @@ public class Insect {
 
     private boolean isActive;
 
-    public Insect() {
+    public int whichAnimation;
+
+    private Random random;
+
+    public Insect(int screenX, int screenY) {
         isActive = false;
         rect = new RectF();
+        x = random.nextInt(screenX);
+        y = screenY;
+        whichAnimation = 1;
     }
 
     public RectF getRect() {
@@ -41,14 +50,14 @@ public class Insect {
         isActive = false;
     }
 
-    public void move(float startX, float startY, int direction) {
-        if(!isActive) {
-            x = startX;
-            y = startY;
-            heading = direction;
-            isActive = true;
-        }
-    }
+//    public void move(float startX, float startY, int direction) {
+//        if(!isActive) {
+//            x = startX;
+//            y = startY;
+//            heading = direction;
+//            isActive = true;
+//        }
+//    }
 
     public void update(long fps) {
         if(heading == UP) {

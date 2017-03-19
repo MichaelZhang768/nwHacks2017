@@ -42,10 +42,16 @@ public class GameView extends SurfaceView implements Runnable {
     private SoundPool soundPool;
     private int squishBugID = -1;
 
-    Bitmap bitmapInsect;
+    Bitmap bitmapInsect1;
+    Bitmap bitmapInsect2;
+    Bitmap bitmapInsect3;
+    Bitmap bitmapInsect4;
 
     int score = 0;
     int lives = 9;
+
+    private long animationInterval = 250;
+    private long lastAnimationTime = System.currentTimeMillis();
 
     public GameView(Context context, int x, int y) {
         super(context);
@@ -67,14 +73,17 @@ public class GameView extends SurfaceView implements Runnable {
             Log.e("Error", "failed to load sound files");
         }
 
-        bitmapInsect = BitmapFactory.decodeResource(this.getResources(), R.drawable.insect);
+        bitmapInsect1 = BitmapFactory.decodeResource(this.getResources(), R.drawable.insect1);
+        bitmapInsect2 = BitmapFactory.decodeResource(this.getResources(), R.drawable.insect2);
+        bitmapInsect3 = BitmapFactory.decodeResource(this.getResources(), R.drawable.insect3);
+        bitmapInsect4 = BitmapFactory.decodeResource(this.getResources(), R.drawable.insect4);
 
         prepareLevel();
     }
 
     private void prepareLevel() {
         for(int i = 0; i < insects.length; i++) {
-            insects[i] = new Insect();
+            insects[i] = new Insect(screenXSize, screenYSize);
         }
     }
 
