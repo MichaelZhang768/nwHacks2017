@@ -11,8 +11,8 @@ public class Insect {
 
     private float x;
     private float y;
-    private float screenX;
-    private float screenY;
+    private int screenX;
+    private int screenY;
 
     private RectF rect;
 
@@ -56,6 +56,8 @@ public class Insect {
 
     public void setInactive() {
         isActive = false;
+        x = random.nextInt(screenX);
+        y = screenY;
     }
 
     public float getX() {
