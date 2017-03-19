@@ -46,6 +46,14 @@ public class Insect {
         this.screenY = screenY;
     }
 
+    public float getX() {
+        return x;
+    }
+
+    public float getY() {
+        return y;
+    }
+
     public RectF getRect() {
         return rect;
     }

@@ -84,6 +84,7 @@ public class GameView extends SurfaceView implements Runnable {
     private void prepareLevel() {
         for(int i = 0; i < insects.length; i++) {
             insects[i] = new Insect(screenXSize, screenYSize);
+            numInsects++;
         }
     }
 
@@ -145,7 +146,17 @@ public class GameView extends SurfaceView implements Runnable {
 
             for(int i = 0; i < insects.length; i++) {
                 if(insects[i].getStatus()) {
-
+                    if(timeFrame - lastAnimationTime > animationInterval) {
+                        if(insects[i].whichAnimation != 4) {
+                            insects[i].whichAnimation++;
+                        } else {
+                            insects[i].whichAnimation = 1;
+                        }
+                        drawInsect(insects[i]);
+                    } else {
+                        drawInsect(insects[i]);
+                    }
+                    lastAnimationTime = System.currentTimeMillis();
                 }
             }
 
@@ -155,6 +166,23 @@ public class GameView extends SurfaceView implements Runnable {
             canvas.drawText("" + fps , 10, 100, paint);
 
             surfaceHolder.unlockCanvasAndPost(canvas);
+        }
+    }
+
+    private void drawInsect(Insect insect) {
+        switch (insect.whichAnimation) {
+            case 1:
+                canvas.drawBitmap(bitmapInsect1, insect.getX(), insect.getY(), paint);
+                break;
+            case 2:
+                canvas.drawBitmap(bitmapInsect2, insect.getX(), insect.getY(), paint);
+                break;
+            case 3:
+                canvas.drawBitmap(bitmapInsect3, insect.getX(), insect.getY(), paint);
+                break;
+            case 4:
+                canvas.drawBitmap(bitmapInsect4, insect.getX(), insect.getY(), paint);
+                break;
         }
     }
 
