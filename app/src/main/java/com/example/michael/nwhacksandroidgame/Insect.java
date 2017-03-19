@@ -1,7 +1,6 @@
 package com.example.michael.nwhacksandroidgame;
 
 import android.graphics.RectF;
-
 import java.util.Random;
 
 /**
@@ -12,14 +11,22 @@ public class Insect {
 
     private float x;
     private float y;
+    private float screenX;
+    private float screenY;
 
     private RectF rect;
 
     public final int UP = 0;
     public final int DOWN = 1;
+    public final int LEFT = 2;
+    public final int RIGHT = 3;
 
-    private int heading = -1;
-    private float speed = 350;
+    private Random random;
+
+    private int headingY = 0;
+    private int headingX = 2;
+    private float speedY = random.nextInt(700);
+    private float speedX = random.nextInt(700);
 
     private int width = 200;
     private int height = 200;
@@ -28,7 +35,6 @@ public class Insect {
 
     public int whichAnimation;
 
-    private Random random;
 
     public Insect(int screenX, int screenY) {
         isActive = false;
@@ -36,6 +42,8 @@ public class Insect {
         x = random.nextInt(screenX);
         y = screenY;
         whichAnimation = 1;
+        this.screenX = screenX;
+        this.screenY = screenY;
     }
 
     public RectF getRect() {
@@ -50,6 +58,18 @@ public class Insect {
         isActive = false;
     }
 
+    public float getX() {
+        return x;
+    }
+
+    public float getY() {
+        return y;
+    }
+
+    public void setActive() {
+        isActive = true;
+    }
+
 //    public void move(float startX, float startY, int direction) {
 //        if(!isActive) {
 //            x = startX;
@@ -60,10 +80,18 @@ public class Insect {
 //    }
 
     public void update(long fps) {
-        if(heading == UP) {
-            y = y - speed/fps;
+        if(headingY == UP && headingX == LEFT) {
+            y = y - speedY/fps;
+            x = x - speedX/fps;
+        } else if (headingY == UP && headingX == RIGHT){
+            y = y - speedY/fps;
+            x = x + speedX/fps;
+        } else if (headingY == DOWN && headingX == LEFT) {
+            y = y + speedY/fps;
+            x = x - speedX/fps;
         } else {
-            y = y + speed/fps;
+            y = y + speedY/fps;
+            x = x + speedX/fps;
         }
 
         rect.left = x;
@@ -71,4 +99,5 @@ public class Insect {
         rect.top = y;
         rect.bottom = y + height;
     }
+
 }
