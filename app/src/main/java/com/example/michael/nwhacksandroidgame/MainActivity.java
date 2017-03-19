@@ -20,4 +20,16 @@ public class MainActivity extends Activity {
         view = new GameView(this, size.x, size.y);
         setContentView(view);
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        view.resume();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        view.pause();
+    }
 }

@@ -64,15 +64,15 @@ public class GameView extends SurfaceView implements Runnable {
 
         soundPool = new SoundPool(10, AudioManager.STREAM_MUSIC, 0);
 
-        try {
-            AssetManager assetManager = context.getAssets();
-            AssetFileDescriptor assetFileDescriptor;
-
-            assetFileDescriptor = assetManager.openFd("squished.ogg");
-            squishBugID = soundPool.load(assetFileDescriptor, 0);
-        } catch(IOException e) {
-            Log.e("Error", "failed to load sound files");
-        }
+//        try {
+//            AssetManager assetManager = context.getAssets();
+//            AssetFileDescriptor assetFileDescriptor;
+//
+//            assetFileDescriptor = assetManager.openFd("squished.ogg");
+//            squishBugID = soundPool.load(assetFileDescriptor, 0);
+//        } catch(IOException e) {
+//            Log.e("Error", "failed to load sound files");
+//        }
 
         bitmapInsect1 = BitmapFactory.decodeResource(this.getResources(), R.drawable.insect1);
         bitmapInsect2 = BitmapFactory.decodeResource(this.getResources(), R.drawable.insect2);
@@ -87,32 +87,32 @@ public class GameView extends SurfaceView implements Runnable {
             insects[i] = new Insect(screenXSize, screenYSize);
             numInsects++;
         }
+        lives = 9;
+        score = 0;
     }
 
     @Override
     public void run() {
-        long startTimeFrame = System.currentTimeMillis();
+        while(playing) {
+            long startTimeFrame = System.currentTimeMillis();
+            if (!paused) {
+                update();
+            }
 
-        if(!paused) {
-            update();
-        }
+            draw();
 
-        draw();
-
-        timeFrame = System.currentTimeMillis() - startTimeFrame;
-        if(timeFrame >= 1) {
-            fps = 1000/timeFrame;
+            timeFrame = System.currentTimeMillis() - startTimeFrame;
+            if (timeFrame >= 1) {
+                fps = 1000 / timeFrame;
+            }
         }
     }
 
     private void update() {
-        boolean lost = false;
-
         Random random = new Random();
         for(int i = 0; i < insects.length; i++) {
             if(!insects[i].getStatus()) {
                 if(random.nextInt(1000) == 0) {
-                    System.out.println("hi");
                     insects[i].setActive();
                 }
             }
@@ -126,12 +126,14 @@ public class GameView extends SurfaceView implements Runnable {
                         insects[i].getRect().left > screenXSize || insects[i].getRect().top > screenYSize) {
                     insects[i].setInactive();
                     lives--;
+                    if(lives == 0) {
+                        paused = true;
+                    }
                 }
             }
         }
 
-        lost = true;
-        if(lost) {
+        if(paused) {
             prepareLevel();
         }
     }
@@ -202,6 +204,7 @@ public class GameView extends SurfaceView implements Runnable {
     public boolean onTouchEvent(MotionEvent motionEvent) {
         switch(motionEvent.getAction() & MotionEvent.ACTION_MASK) {
             case MotionEvent.ACTION_DOWN:
+                paused = false;
                 float motionEventX = motionEvent.getX();
                 float motionEventY = motionEvent.getY();
                 RectF insectRect;
@@ -209,6 +212,7 @@ public class GameView extends SurfaceView implements Runnable {
                     insectRect = insects[i].getRect();
                     if(insectRect.right > motionEventX && insectRect.left < motionEventX) {
                         if(insectRect.bottom > motionEventY && insectRect.top < motionEventY) {
+                            score++;
                             insects[i].setInactive();
                             soundPool.play(squishBugID, 1, 1, 0, 0, 1);
                         }
