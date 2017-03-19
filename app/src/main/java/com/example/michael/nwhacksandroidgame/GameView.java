@@ -33,11 +33,12 @@ public class GameView extends SurfaceView implements Runnable {
     private Canvas canvas;
     private Paint paint;
     private long fps;
+    private long startTimeFrame;
     private long timeFrame;
     private int screenXSize;
     private int screenYSize;
 
-    private Insect[] insects = new Insect[20];
+    private Insect[] insects = new Insect[10];
     int numInsects = 0;
 
     private SoundPool soundPool;
@@ -47,11 +48,12 @@ public class GameView extends SurfaceView implements Runnable {
     Bitmap bitmapInsect2;
     Bitmap bitmapInsect3;
     Bitmap bitmapInsect4;
+    Bitmap bitmapSplat;
 
     int score = 0;
     int lives = 9;
 
-    private long animationInterval = 250;
+    private long animationInterval = 100;
     private long lastAnimationTime = System.currentTimeMillis();
 
     public GameView(Context context, int x, int y) {
@@ -78,12 +80,13 @@ public class GameView extends SurfaceView implements Runnable {
         bitmapInsect2 = BitmapFactory.decodeResource(this.getResources(), R.drawable.insect2);
         bitmapInsect3 = BitmapFactory.decodeResource(this.getResources(), R.drawable.insect3);
         bitmapInsect4 = BitmapFactory.decodeResource(this.getResources(), R.drawable.insect4);
+        bitmapSplat = BitmapFactory.decodeResource(this.getResources(), R.drawable.splat);
 
         prepareLevel();
     }
 
     private void prepareLevel() {
-        for(int i = 0; i < insects.length; i++) {
+        for (int i = 0; i < insects.length; i++) {
             insects[i] = new Insect(screenXSize, screenYSize);
             numInsects++;
         }
@@ -93,8 +96,8 @@ public class GameView extends SurfaceView implements Runnable {
 
     @Override
     public void run() {
-        while(playing) {
-            long startTimeFrame = System.currentTimeMillis();
+        while (playing) {
+            startTimeFrame = System.currentTimeMillis();
             if (!paused) {
                 update();
             }
@@ -110,60 +113,65 @@ public class GameView extends SurfaceView implements Runnable {
 
     private void update() {
         Random random = new Random();
-        for(int i = 0; i < insects.length; i++) {
-            if(!insects[i].getStatus()) {
-                if(random.nextInt(1000) == 0) {
+        for (int i = 0; i < insects.length; i++) {
+            if (!insects[i].getStatus()) {
+                if (random.nextInt(250) == 0) {
+                    insects[i].setX(random.nextInt(screenXSize) - insects[i].width);
+                    insects[i].setY(screenYSize - insects[i].height);
                     insects[i].setActive();
                 }
             }
         }
 
         // Update all the invaders bullets if active
-        for(int i = 0; i < insects.length; i++) {
-            if(insects[i].getStatus()) {
+        for (int i = 0; i < insects.length; i++) {
+            if (insects[i].getStatus()) {
                 insects[i].update(fps);
-                if (insects[i].getRect().right < 0 || insects[i].getRect().bottom < 0 ||
-                        insects[i].getRect().left > screenXSize || insects[i].getRect().top > screenYSize) {
+                if (insects[i].getRect().right + 200 < 0 || insects[i].getRect().bottom + 200 < 0 ||
+                        insects[i].getRect().left + 200 > screenXSize || insects[i].getRect().top + 200 > screenYSize) {
                     insects[i].setInactive();
                     lives--;
-                    if(lives == 0) {
+                    if (lives == 0) {
                         paused = true;
                     }
                 }
             }
         }
 
-        if(paused) {
+        if (paused) {
             prepareLevel();
         }
     }
 
     private void draw() {
-        if(surfaceHolder.getSurface().isValid()) {
+        if (surfaceHolder.getSurface().isValid()) {
             canvas = surfaceHolder.lockCanvas();
             canvas.drawColor(Color.argb(255, 26, 128, 182));
             paint.setColor(Color.argb(255, 255, 255, 255));
 
-            for(int i = 0; i < insects.length; i++) {
-                if(insects[i].getStatus()) {
-                    if(timeFrame - lastAnimationTime > animationInterval) {
-                        if(insects[i].whichAnimation != 4) {
+            for (int i = 0; i < insects.length; i++) {
+                if (insects[i].getStatus()) {
+                    if (startTimeFrame - lastAnimationTime > animationInterval) {
+                        if (insects[i].whichAnimation != 4) {
                             insects[i].whichAnimation++;
                         } else {
                             insects[i].whichAnimation = 1;
                         }
                         drawInsect(insects[i]);
+                        lastAnimationTime = System.currentTimeMillis();
                     } else {
                         drawInsect(insects[i]);
                     }
-                    lastAnimationTime = System.currentTimeMillis();
+                } else {
+                    canvas.drawBitmap(bitmapSplat, insects[i].getRect().left, insects[i].getRect().top, paint);
                 }
             }
 
             paint.setColor(Color.argb(255, 249, 129, 0));
             paint.setTextSize(40);
-            canvas.drawText("Score: " + score + " Lives: " + lives, 10, 50, paint);
-            canvas.drawText("" + fps , 10, 100, paint);
+            canvas.drawText("Score: " + score, 10, 50, paint);
+            canvas.drawText("Lives: " + lives, 10, 100, paint);
+            canvas.drawText("" + fps, 10, 150, paint);
 
             surfaceHolder.unlockCanvasAndPost(canvas);
         }
@@ -172,16 +180,16 @@ public class GameView extends SurfaceView implements Runnable {
     private void drawInsect(Insect insect) {
         switch (insect.whichAnimation) {
             case 1:
-                canvas.drawBitmap(bitmapInsect1, insect.getX(), insect.getY(), paint);
+                canvas.drawBitmap(bitmapInsect1, insect.getRect().left, insect.getRect().top, paint);
                 break;
             case 2:
-                canvas.drawBitmap(bitmapInsect2, insect.getX(), insect.getY(), paint);
+                canvas.drawBitmap(bitmapInsect2, insect.getRect().left, insect.getRect().top, paint);
                 break;
             case 3:
-                canvas.drawBitmap(bitmapInsect3, insect.getX(), insect.getY(), paint);
+                canvas.drawBitmap(bitmapInsect3, insect.getRect().left, insect.getRect().top, paint);
                 break;
             case 4:
-                canvas.drawBitmap(bitmapInsect4, insect.getX(), insect.getY(), paint);
+                canvas.drawBitmap(bitmapInsect4, insect.getRect().left, insect.getRect().top, paint);
                 break;
         }
     }
@@ -190,7 +198,7 @@ public class GameView extends SurfaceView implements Runnable {
         playing = false;
         try {
             thread.join();
-        } catch(InterruptedException e) {
+        } catch (InterruptedException e) {
             Log.e("Error:", "joining thread");
         }
     }
@@ -202,19 +210,20 @@ public class GameView extends SurfaceView implements Runnable {
     }
 
     public boolean onTouchEvent(MotionEvent motionEvent) {
-        switch(motionEvent.getAction() & MotionEvent.ACTION_MASK) {
+        switch (motionEvent.getAction() & MotionEvent.ACTION_MASK) {
             case MotionEvent.ACTION_DOWN:
                 paused = false;
                 float motionEventX = motionEvent.getX();
                 float motionEventY = motionEvent.getY();
                 RectF insectRect;
-                for(int i = 0; i < insects.length; i++) {
-                    insectRect = insects[i].getRect();
-                    if(insectRect.right > motionEventX && insectRect.left < motionEventX) {
-                        if(insectRect.bottom > motionEventY && insectRect.top < motionEventY) {
-                            score++;
-                            insects[i].setInactive();
-                            soundPool.play(squishBugID, 1, 1, 0, 0, 1);
+                for (int i = 0; i < insects.length; i++) {
+                    if (insects[i].getX()+2*insects[i].width > motionEventX && insects[i].getX() < motionEventX) {
+                        if (insects[i].getY()+insects[i].height > motionEventY && insects[i].getY() < motionEventY) {
+                            if (insects[i].getStatus()) {
+                                score++;
+                                insects[i].setInactive();
+                                soundPool.play(squishBugID, 1, 1, 0, 0, 1);
+                            }
                         }
                     }
                 }

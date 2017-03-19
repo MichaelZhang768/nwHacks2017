@@ -25,11 +25,11 @@ public class Insect {
 
     private int headingY = 0;
     private int headingX = 2;
-    private float speedY = random.nextInt(700);
-    private float speedX = random.nextInt(700);
+    private float speedY = random.nextInt(500);
+    private float speedX = random.nextInt(500);
 
-    private int width = 200;
-    private int height = 200;
+    public int width = 200;
+    public int height = 200;
 
     private boolean isActive;
 
@@ -39,11 +39,25 @@ public class Insect {
     public Insect(int screenX, int screenY) {
         isActive = false;
         rect = new RectF();
-        x = random.nextInt(screenX);
-        y = screenY;
+        x = random.nextInt(screenX) + width;
+        y = screenY + height;
         whichAnimation = 1;
         this.screenX = screenX;
         this.screenY = screenY;
+        Random random = new Random();
+        int upOrDown = random.nextInt(2);
+        int leftOrRight = random.nextInt(2);
+        if(leftOrRight == 0) {
+            headingX = LEFT;
+        } else {
+            headingX = RIGHT;
+        }
+//        if(upOrDown == 0) {
+//            headingY = UP;
+//        } else {
+//            headingY = DOWN;
+//            y = 0;
+//        }
     }
 
     public RectF getRect() {
@@ -56,8 +70,6 @@ public class Insect {
 
     public void setInactive() {
         isActive = false;
-        x = random.nextInt(screenX);
-        y = screenY;
     }
 
     public float getX() {
@@ -68,18 +80,17 @@ public class Insect {
         return y;
     }
 
+    public void setX(float x) {
+        this.x = x;
+    }
+
+    public void setY(float y) {
+        this.y = y;
+    }
+
     public void setActive() {
         isActive = true;
     }
-
-//    public void move(float startX, float startY, int direction) {
-//        if(!isActive) {
-//            x = startX;
-//            y = startY;
-//            heading = direction;
-//            isActive = true;
-//        }
-//    }
 
     public void update(long fps) {
         if(headingY == UP && headingX == LEFT) {
@@ -96,10 +107,10 @@ public class Insect {
             x = x + speedX/fps;
         }
 
-        rect.left = x;
-        rect.right = x + width;
-        rect.top = y;
-        rect.bottom = y + height;
+        rect.left = x- width/2;
+        rect.right = x + width/2;
+        rect.top = y - height/2;
+        rect.bottom = y+height/2 ;
     }
 
 }
