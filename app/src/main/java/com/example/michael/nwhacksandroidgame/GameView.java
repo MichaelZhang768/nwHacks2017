@@ -26,7 +26,6 @@ import java.util.Random;
 
 public class GameView extends SurfaceView implements Runnable {
 
-    private Context context;
     private Thread thread = null;
     private SurfaceHolder surfaceHolder;
     private volatile boolean playing;
@@ -57,7 +56,6 @@ public class GameView extends SurfaceView implements Runnable {
     int lives = 9;
 
     private long animationInterval = 100;
-    private long lastAnimationTime = System.currentTimeMillis();
 
     public GameView(Context context, int x, int y) {
         super(context);
@@ -150,23 +148,19 @@ public class GameView extends SurfaceView implements Runnable {
     private void draw() {
         if (surfaceHolder.getSurface().isValid()) {
             canvas = surfaceHolder.lockCanvas();
-//            canvas.drawColor(Color.argb(255, 26, 128, 182));
-//            paint.setColor(Color.argb(255, 255, 255, 255));
             Rect rect = new Rect(0, 0, screenXSize, screenYSize);
             canvas.drawBitmap(bitmapBackground, null, rect, paint);
-            //canvas.drawBitmap(bitmapBackground, 0, 0, null);
-
 
             for (int i = 0; i < insects.length; i++) {
                 if (insects[i].getStatus()) {
-                    if (startTimeFrame - lastAnimationTime > animationInterval) {
+                    if (startTimeFrame - insects[i].lastAnimationTime > animationInterval) {
                         if (insects[i].whichAnimation != 4) {
                             insects[i].whichAnimation++;
                         } else {
                             insects[i].whichAnimation = 1;
                         }
                         drawInsect(insects[i]);
-                        lastAnimationTime = System.currentTimeMillis();
+                        insects[i].lastAnimationTime = System.currentTimeMillis();
                     } else {
                         drawInsect(insects[i]);
                     }
@@ -178,10 +172,15 @@ public class GameView extends SurfaceView implements Runnable {
             }
 
             paint.setColor(Color.argb(255, 249, 129, 0));
-            paint.setTextSize(40);
+            paint.setTextSize(60);
             canvas.drawText("Score: " + score, 10, 50, paint);
             canvas.drawText("Lives: " + lives, 10, 100, paint);
-            canvas.drawText("" + fps, 10, 150, paint);
+            canvas.drawText("FPS:" + fps, 10, 150, paint);
+
+            if(paused) {
+                paint.setTextSize(100);
+                canvas.drawText("Tap the screen to play!", screenXSize/3, screenYSize/2, paint);
+            }
 
             surfaceHolder.unlockCanvasAndPost(canvas);
         }
@@ -225,10 +224,9 @@ public class GameView extends SurfaceView implements Runnable {
                 paused = false;
                 float motionEventX = motionEvent.getX();
                 float motionEventY = motionEvent.getY();
-                RectF insectRect;
                 for (int i = 0; i < insects.length; i++) {
-                    if (insects[i].getX()+2*insects[i].width > motionEventX && insects[i].getX() < motionEventX) {
-                        if (insects[i].getY()+insects[i].height > motionEventY && insects[i].getY() < motionEventY) {
+                    if (insects[i].getX()+3*insects[i].width > motionEventX && insects[i].getX() < motionEventX) {
+                        if (insects[i].getY()+2*insects[i].height > motionEventY && insects[i].getY() < motionEventY) {
                             if (insects[i].getStatus()) {
                                 score++;
                                 insects[i].setInactive();

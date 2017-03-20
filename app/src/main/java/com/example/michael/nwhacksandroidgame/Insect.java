@@ -36,6 +36,7 @@ public class Insect {
     public int whichAnimation;
 
     public long splatStartTime;
+    public long lastAnimationTime;
 
     public Insect(int screenX, int screenY) {
         isActive = false;
